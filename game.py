@@ -1,5 +1,6 @@
 import pygame as pg
-import os
+from os import listdir
+from time import sleep
 
 
 class Game:
@@ -20,11 +21,13 @@ class Game:
                 if event.type == pg.MOUSEBUTTONDOWN:
                     position = pg.mouse.get_pos()
                     left_click, middle_click, right_click = pg.mouse.get_pressed(3)
-                    print(pg.mouse.get_pressed(3))
-                    print(position)
                     self.handle_click(position, left_click, right_click)
-                self.draw()
+            self.draw()
             pg.display.flip()
+            if self.board.get_won():
+                # sound
+                sleep(3)
+                running = False
         pg.quit()
 
     def draw(self):
@@ -39,7 +42,7 @@ class Game:
 
     def load_images(self):
         self.images = {}
-        for file_name in os.listdir("images"):
+        for file_name in listdir("images"):
             if not file_name.endswith(".png"):
                 continue
             image = pg.image.load("images/" + file_name)
@@ -47,16 +50,13 @@ class Game:
             self.images[file_name.split(".")[0]] = image
 
     def get_image(self, piece):
-        string = None
         if piece.get_clicked():
-            pass
+            string = "bomb-at-clicked-block" if piece.get_has_bomb() else str(piece.get_num_around())
         else:
-            string = "empty-block"
+            string = "flag" if piece.get_flagged() else "empty-block"
         return self.images[string]
 
     def handle_click(self, position, left_click, right_click):
         index = position[1] // self.piece_size[0], position[0] // self.piece_size[1]
-        print(index)
         piece = self.board.get_piece(index)
         self.board.handle_click(piece, left_click, right_click)
-

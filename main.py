@@ -1,9 +1,9 @@
-from minesweeper import Game
+from game import Game
 from board import Board
 
 if __name__ == "__main__":
-    board_size = (10, 10)
-    prob = 0.5
+    board_size = (6, 6)
+    prob = 0.1
     board = Board(board_size, prob)
     screen_size = (800, 800)
     game = Game(board, screen_size)

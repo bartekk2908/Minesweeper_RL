@@ -33,4 +33,5 @@ class Piece:
     def toggle_flagged(self):
         self.flagged = not self.flagged
 
-
+    def get_neighbours(self):
+        return self.neighbours

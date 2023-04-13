@@ -6,6 +6,10 @@ class Board:
     def __init__(self, size, prob):
         self.size = size
         self.prob = prob
+        self.won = False
+        self.lost = False
+        self.num_clicked = 0
+        self.num_non_bombs = 0
         self.set_board()
 
     def set_board(self):
@@ -14,6 +18,8 @@ class Board:
             row = []
             for col in range(self.size[1]):
                 has_bomb = random() < self.prob
+                if not has_bomb:
+                    self.num_non_bombs += 1
                 piece = Piece(has_bomb)
                 row.append(piece)
             self.board.append(row)
@@ -44,9 +50,27 @@ class Board:
         return self.board[index[0]][index[1]]
 
     def handle_click(self, piece, piece_click, flag):
+        if self.lost:
+            return
         if piece.get_clicked() or (not flag and piece.get_flagged()):
             return
-        elif piece_click:
-            piece.click()
-        elif flag:
+        if flag:
             piece.toggle_flagged()
+        if piece_click:
+            piece.click()
+            if piece.get_has_bomb():
+                self.lost = True
+                return
+            self.num_clicked += 1
+            if piece.get_num_around() != 0:
+                return
+            for neighbour in piece.get_neighbours():
+                if not neighbour.get_has_bomb() and not neighbour.get_clicked():
+                    self.handle_click(neighbour, True, False)
+
+    def get_lost(self):
+        return self.lost
+
+    def get_won(self):
+        return self.num_non_bombs == self.num_clicked
+
