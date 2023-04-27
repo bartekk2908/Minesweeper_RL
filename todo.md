@@ -11,7 +11,7 @@
 - cool colors
 
 
-### Notatki
+### Notes:
 1. on policy/off policy
 2. gradient policy
 3. reward function
