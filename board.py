@@ -1,15 +1,15 @@
 from piece import Piece
-from random import random
+from random import sample
+from itertools import product
 
 
 class Board:
-    def __init__(self, size, prob):
+    def __init__(self, size, num_bombs):
         self.size = size
-        self.prob = prob
+        self.num_bombs = num_bombs
         self.won = False
         self.lost = False
         self.num_clicked = 0
-        self.num_non_bombs = 0
         self.set_board()
 
     def set_board(self):
@@ -17,12 +17,13 @@ class Board:
         for row in range(self.size[0]):
             row = []
             for col in range(self.size[1]):
-                has_bomb = random() < self.prob
-                if not has_bomb:
-                    self.num_non_bombs += 1
-                piece = Piece(has_bomb)
+                piece = Piece(False)
                 row.append(piece)
             self.board.append(row)
+        indexes_for_bombs = sample(list(product(range(self.size[0]), range(self.size[1]))), self.num_bombs + 1)
+        for row, col in indexes_for_bombs[:-1]:
+            self.board[row][col].has_bomb = True
+        self.piece_for_replacement = self.get_piece(indexes_for_bombs[-1])
         self.set_neighbours()
 
     def set_neighbours(self):
@@ -49,14 +50,17 @@ class Board:
     def get_piece(self, index):
         return self.board[index[0]][index[1]]
 
-    def handle_click(self, piece, piece_click, flag):
+    def handle_click(self, piece, piece_click, flag_click):
         if self.lost:
             return
-        if piece.get_clicked() or (not flag and piece.get_flagged()):
+        if piece.get_clicked() or (not flag_click and piece.get_flagged()):
             return
-        if flag:
+        if flag_click:
             piece.toggle_flagged()
         if piece_click:
+            if not self.num_clicked and piece.get_has_bomb():
+                piece.has_bomb = False
+                self.piece_for_replacement.has_bomb = True
             piece.click()
             if piece.get_has_bomb():
                 self.lost = True
@@ -72,5 +76,5 @@ class Board:
         return self.lost
 
     def get_won(self):
-        return self.num_non_bombs == self.num_clicked
+        return self.num_bombs == self.size[0] * self.size[1] - self.num_clicked
 

@@ -1,6 +1,4 @@
 ## TODO:
-- given number of mines instead of probability (0 mines games problem)
-- cant loose after first click
 - win and loose conditions for agent to play
 - playing agent (random moves)
 - rl (plan and implementation)
@@ -11,7 +9,7 @@
 - cool colors
 
 
-### Notatki
+### Notes:
 1. on policy/off policy
 2. gradient policy
 3. reward function

@@ -2,9 +2,9 @@ from game import Game
 from board import Board
 
 if __name__ == "__main__":
-    board_size = (13, 13)
-    prob = 0.1
-    board = Board(board_size, prob)
-    screen_size = (800, 800)
+    board_size = (9, 9)
+    num_bombs = 10
+    board = Board(board_size, num_bombs)
+    screen_size = (700, 700)
     game = Game(board, screen_size)
     game.run()

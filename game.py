@@ -24,9 +24,9 @@ class Game:
                     self.handle_click(position, left_click, right_click)
             self.draw()
             pg.display.flip()
-            if self.board.get_won():
+            if self.board.get_won() or self.board.get_lost():
                 # sound
-                sleep(3)
+                sleep(2)
                 running = False
         pg.quit()
 
@@ -53,7 +53,15 @@ class Game:
         if piece.get_clicked():
             string = "bomb-at-clicked-block" if piece.get_has_bomb() else str(piece.get_num_around())
         else:
-            string = "flag" if piece.get_flagged() else "empty-block"
+            if self.board.get_won():
+                string = "flag"
+            elif self.board.get_lost():
+                if piece.get_has_bomb():
+                    string = "flag" if piece.get_flagged() else "unclicked-bomb"
+                else:
+                    string = "wrong-flag" if piece.get_flagged() else "empty-block"
+            else:
+                string = "flag" if piece.get_flagged() else "empty-block"
         return self.images[string]
 
     def handle_click(self, position, left_click, right_click):
