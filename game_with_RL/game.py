@@ -3,6 +3,8 @@ from os import listdir
 from time import sleep
 
 
+IMAGES_DIR = "../Images"
+
 class Game:
     def __init__(self, board, screen_size):
         self.board = board
@@ -42,10 +44,10 @@ class Game:
 
     def load_images(self):
         self.images = {}
-        for file_name in listdir("images"):
+        for file_name in listdir(IMAGES_DIR):
             if not file_name.endswith(".png"):
                 continue
-            image = pg.image.load("images/" + file_name)
+            image = pg.image.load(f"{IMAGES_DIR}/" + file_name)
             image = pg.transform.scale(image, self.piece_size)
             self.images[file_name.split(".")[0]] = image
 
