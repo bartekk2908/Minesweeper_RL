@@ -10,9 +10,10 @@ class Game:
         self.board = board
         self.screen_size = screen_size
         self.piece_size = self.screen_size[0] // self.board.get_size()[1], self.screen_size[1] // self.board.get_size()[0]
+        self.last_clicked = None
         self.load_images()
 
-    def run(self):
+    def run_user(self):
         pg.init()
         self.screen = pg.display.set_mode(self.screen_size)
         running = True
@@ -28,8 +29,9 @@ class Game:
             pg.display.flip()
             if self.board.get_won() or self.board.get_lost():
                 # sound
-                sleep(2)
-                running = False
+                sleep(1)
+                # running = False
+                self.board.reset_board()
         pg.quit()
 
     def draw(self):
@@ -41,6 +43,8 @@ class Game:
                 self.screen.blit(image, top_left)
                 top_left = top_left[0] + self.piece_size[0], top_left[1]
             top_left = 0, top_left[1] + self.piece_size[1]
+        if self.last_clicked:
+            self.screen.blit(self.images["frame"], (self.last_clicked[1] * self.piece_size[0], self.last_clicked[0] * self.piece_size[1]))
 
     def load_images(self):
         self.images = {}
@@ -67,6 +71,15 @@ class Game:
         return self.images[string]
 
     def handle_click(self, position, left_click, right_click):
-        index = position[1] // self.piece_size[0], position[0] // self.piece_size[1]
+        index = position[1] // self.piece_size[1], position[0] // self.piece_size[0]
         piece = self.board.get_piece(index)
         self.board.handle_click(piece, left_click, right_click)
+        self.last_clicked = index
+
+    def init_visualization(self):
+        pg.init()
+        self.screen = pg.display.set_mode(self.screen_size)
+
+    def visualize_agent(self):
+        self.draw()
+        pg.display.flip()

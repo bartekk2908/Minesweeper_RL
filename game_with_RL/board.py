@@ -1,6 +1,7 @@
 from piece import Piece
 from random import sample
 from itertools import product
+from numpy import empty
 
 
 class Board:
@@ -24,7 +25,6 @@ class Board:
         for row, col in indexes_for_bombs[:-1]:
             self.board[row][col].has_bomb = True
         self.piece_for_replacement = self.get_piece(indexes_for_bombs[-1])
-        self.set_neighbours()
 
     def set_neighbours(self):
         for row in range(self.size[0]):
@@ -58,9 +58,11 @@ class Board:
         if flag_click:
             piece.toggle_flagged()
         if piece_click:
-            if not self.num_clicked and piece.get_has_bomb():
-                piece.has_bomb = False
-                self.piece_for_replacement.has_bomb = True
+            if not self.num_clicked:
+                if piece.get_has_bomb():
+                    piece.has_bomb = False
+                    self.piece_for_replacement.has_bomb = True
+                self.set_neighbours()
             piece.click()
             if piece.get_has_bomb():
                 self.lost = True
@@ -78,3 +80,22 @@ class Board:
     def get_won(self):
         return self.num_bombs == self.size[0] * self.size[1] - self.num_clicked
 
+    def reset_board(self):
+        self.won = False
+        self.lost = False
+        self.num_clicked = 0
+        self.set_board()
+
+    def represent_state(self):
+        state = empty((self.size[0], self.size[1]), dtype=int)
+        for row in range(self.size[0]):
+            for col in range(self.size[1]):
+                piece = self.get_piece((row, col))
+                if not piece.get_clicked():
+                    state[row][col] = -1
+                else:
+                    if piece.get_has_bomb():
+                        state[row][col] = -2
+                    else:
+                        state[row][col] = piece.get_num_around()
+        return state

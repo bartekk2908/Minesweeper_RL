@@ -1,12 +1,11 @@
 ## TODO:
-- win and loose conditions for agent to play
-- playing agent (random moves)
-- rl (plan and implementation)
-- displayed counters (num of games played, num of mines found)
+- playing agent
+- training by DQLN
+- report
 
 #### Nice to have:
 - better images
-- cool colors
+- readme
 
 
 ### Notes:
