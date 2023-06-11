@@ -5,36 +5,30 @@ from collections import deque
 
 
 class RL_Agent:
-    def __init__(self, board_size, model_name=None, conv_units=64, dense_units=256, discount=0.1,
+    def __init__(self, board_size, conv_units=64, dense_units=256, discount=0.1,
                  learn_rate=0.01, learn_decay=0.99975, learn_min=0.001,
                  epsilon=0.95, epsilon_decay=0.99975, epsilon_min=0.81,
                  memory_size=50_000, memory_min=1_000,
-                 batch_size=64, update_target_every=5, model=None):
-        if model_name:
-            self.model_name = model_name
-        else:
-            self.model_name = 'model'
+                 batch_size=64, update_target_every=5,
+                 model=None):
 
         self.board_size = board_size
 
-        if model:
+        self.learn_rate = learn_rate
+        self.learn_decay = learn_decay
+        self.learn_min = learn_min
+
+        if model:   # if agent is being tested
             self.model = model
-            self.epsilon = 0
-        else:
-            # deep q-learning parameters
-            self.discount = discount
-
-            self.learn_rate = learn_rate
-            self.learn_decay = learn_decay
-            self.learn_min = learn_min
-
+            self.epsilon = 0.0
+        else:   # if agent is being trained
+            self.model = dqn(self.learn_rate, self.board_size, self.board_size[0] * self.board_size[1], conv_units, dense_units)
             self.epsilon = epsilon
             self.epsilon_decay = epsilon_decay
             self.epsilon_min = epsilon_min
 
-            self.model = dqn(self.learn_rate, self.board_size, self.board_size[0] * self.board_size[1], conv_units, dense_units)
+            self.discount = discount
 
-            # target model
             self.target_model = dqn(self.learn_rate, self.board_size, self.board_size[0] * self.board_size[1], conv_units, dense_units)
             self.target_model.set_weights(self.model.get_weights())
 
@@ -44,6 +38,9 @@ class RL_Agent:
             self.batch_size = batch_size
             self.update_target_every = update_target_every
             self.target_update_counter = 0
+
+            self.conv_units=conv_units
+            self.dense_units=dense_units
 
     def get_action(self, state):
         possible_moves = []
@@ -111,3 +108,16 @@ class RL_Agent:
 
         # decay epsilon
         self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
+
+    def get_params(self):
+        return (self.board_size, self.learn_rate, self.learn_decay, self.learn_min, self.epsilon, self.epsilon_decay, self.epsilon_min,
+                self.discount, self.replay_memory, self.memory_min, self.batch_size, self.update_target_every, self.target_update_counter,
+                self.conv_units, self.dense_units)
+
+    def load_params(self, params, model):
+        (self.board_size, self.learn_rate, self.learn_decay, self.learn_min, self.epsilon, self.epsilon_decay, self.epsilon_min,
+        self.discount, self.replay_memory, self.memory_min, self.batch_size, self.update_target_every, self.target_update_counter,
+         self.conv_units, self.dense_units) = params
+        self.model = model
+        self.target_model = dqn(self.learn_rate, self.board_size, self.board_size[0] * self.board_size[1], self.conv_units, self.dense_units)
+        self.target_model.set_weights(self.model.get_weights())

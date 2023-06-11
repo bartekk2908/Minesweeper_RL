@@ -5,24 +5,34 @@ from reward import *
 
 from tqdm import tqdm
 import pickle
+from keras.models import load_model
 import os
 
-SAVE_MODEL_EVERY = 200   # save model and replay memory every _ games
+SAVE_MODEL_EVERY = 100   # save model and replay memory every _ games
 DIR_NAME = "models"
 
 
-def train_agent(board_size=(9, 9), num_bombs=10, visual_mode=True, number_of_games=100_000):
+def train_agent(board_size=(9, 9), num_bombs=10, visual_mode=False, number_of_games=100_000, continuing=False, model_name="model"):
     if not os.path.exists(DIR_NAME):
         os.makedirs(DIR_NAME)
 
-    board = Board(board_size, num_bombs)
+    agent = RL_Agent(board_size)
+
+    if continuing:
+        with open(f'{DIR_NAME}/{model_name}_board.pkl', 'rb') as file:
+            board = pickle.load(file)
+        board.reset()
+        with open(f'{DIR_NAME}/{model_name}_params.pkl', 'rb') as file:
+            params = pickle.load(file)
+        model = load_model(f'models/{model_name}.h5')
+        agent.load_params(params, model)
+    else:
+        board = Board(board_size, num_bombs)
 
     screen_size = (700, 700)
     env = Game(board, screen_size)
     if visual_mode:
         env.init_visualization()
-
-    agent = RL_Agent(board_size, model_name="model_1")
 
     for i in tqdm(range(1, number_of_games+1, 1)):
 
@@ -54,13 +64,17 @@ def train_agent(board_size=(9, 9), num_bombs=10, visual_mode=True, number_of_gam
 
         if not i % SAVE_MODEL_EVERY:
 
-            # saving reply memory
-            with open(f'{DIR_NAME}/{agent.model_name}.pkl', 'wb') as file:
-                pickle.dump(agent.replay_memory, file)
+            # saving agent
+            with open(f'{DIR_NAME}/{model_name}_params.pkl', 'wb') as file:
+                pickle.dump(agent.get_params(), file)
+
+            # saving board
+            with open(f'{DIR_NAME}/{model_name}_board.pkl', 'wb') as file:
+                pickle.dump(board, file)
 
             # saving model
-            agent.model.save(f'{DIR_NAME}/{agent.model_name}.h5')
+            agent.model.save(f'{DIR_NAME}/{model_name}.h5')
 
 
 if __name__ == "__main__":
-    train_agent(visual_mode=True)
+    train_agent(visual_mode=False, continuing=True, model_name="model_test_9x9_10")

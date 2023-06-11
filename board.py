@@ -47,6 +47,9 @@ class Board:
     def get_size(self):
         return self.size
 
+    def get_num_clicked(self):
+        return self.num_clicked
+
     def get_piece(self, index):
         return self.board[index[0]][index[1]]
 
