@@ -77,4 +77,4 @@ def train_agent(board_size=(9, 9), num_bombs=10, visual_mode=False, number_of_ga
 
 
 if __name__ == "__main__":
-    train_agent(visual_mode=False, continuing=True, model_name="model_test_9x9_10")
+    train_agent(visual_mode=False, continuing=False, model_name="model_test_9x9_10")
