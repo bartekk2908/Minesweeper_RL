@@ -59,4 +59,4 @@ def test_agent(model_name, board_size=(9, 9), num_bombs=10, number_of_games=100_
 
 
 if __name__ == "__main__":
-    test_agent("model_test_9x9_10", number_of_games=1000, break_time=0.0, get_winrate_every=100, visual_mode=False)
+    test_agent("model_best_9x9_10", number_of_games=1000, break_time=1.0, get_winrate_every=10, visual_mode=True)
