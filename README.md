@@ -1,5 +1,5 @@
 
-# AI based on reinforcement learning learn to play Minesweeper game.
+# RL AI learns to play Minesweeper game.
 
 ## Description
 
